@@ -5,4 +5,5 @@ import com.example.employeetracker.domain.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TeamRepository extends JpaRepository<Team, Long> {
+    boolean existsByTeamLead(Employee teamLead);
 }

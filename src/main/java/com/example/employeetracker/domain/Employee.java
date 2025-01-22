@@ -1,13 +1,9 @@
 package com.example.employeetracker.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -23,8 +19,10 @@ public class Employee {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "team_id", nullable = false)
-    private Team team;
+    @Column(name = "is_team_lead")
+    private boolean isTeamLead = false;
 
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
 }

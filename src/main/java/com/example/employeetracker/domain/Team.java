@@ -22,10 +22,10 @@ public class Team {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "team_lead_id", nullable = false)
-    private TeamLead teamLead;
-
-    @OneToMany(mappedBy = "team")
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Employee> employees;
+
+    @ManyToOne
+    @JoinColumn(name = "team_lead_name")
+    private Employee teamLead;
 }
