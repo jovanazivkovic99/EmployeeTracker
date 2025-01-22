@@ -115,9 +115,13 @@ public class TeamServiceImpl implements TeamService {
         Team team = findTeamById(teamId);
         Employee teamLead = findEmployeeById(employeeId);
 
-        if(teamLead.getTeam() == null || !teamLead.getId().equals(teamId)){
-            throw new IllegalStateException("Lead must be a member of the team.");
+        if (team.getTeamLead() != null) {
+            throw new IllegalStateException("Team already has a lead. Remove the old lead first.");
+        } else {
+            teamLead.setTeam(team);
+            team.getEmployees().add(teamLead);
         }
+
         team.setTeamLead(teamLead);
         return TeamMapper.toResponse(teamRepository.save(team));
     }
