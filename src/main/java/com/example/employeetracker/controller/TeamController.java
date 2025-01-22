@@ -4,6 +4,7 @@ import com.example.employeetracker.request.AddEmployeesRequest;
 import com.example.employeetracker.request.TeamRequest;
 import com.example.employeetracker.response.TeamResponse;
 import com.example.employeetracker.serviceinterface.TeamService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class TeamController {
     private final TeamService teamService;
 
     @PostMapping
-    public TeamResponse createTeam(@RequestBody TeamRequest request) {
+    public TeamResponse createTeam(@Valid @RequestBody TeamRequest request) {
         return teamService.createTeam(request);
     }
 
@@ -46,4 +47,19 @@ public class TeamController {
             @RequestBody AddEmployeesRequest request) {
         return teamService.addEmployeesToTeam(teamId, request);
     }
+
+    @PostMapping("/{teamId}/employee/{employeeId}/assign")
+    public TeamResponse assignTeamLead(
+            @PathVariable Long teamId,
+            @PathVariable Long employeeId) {
+        return teamService.assignTeamLead(teamId, employeeId);
+    }
+
+    @PostMapping("/{teamId}/employee/{employeeId}/remove")
+    public TeamResponse removeEmployeeFromTeam(
+            @PathVariable Long teamId,
+            @PathVariable Long employeeId) {
+        return teamService.removeEmployeeFromTeam(teamId, employeeId);
+    }
+
 }

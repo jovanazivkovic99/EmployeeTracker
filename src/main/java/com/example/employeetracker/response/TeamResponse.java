@@ -7,7 +7,7 @@ import java.util.List;
 
 @Builder
 public record TeamResponse(Long id,
-                           String teamName,
-                           String teamLeadName,
+                           String name,
+                           EmployeeResponse teamLead,
                            List<EmployeeResponse> employees) {
 }

@@ -19,9 +19,6 @@ public class Employee {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "is_team_lead")
-    private boolean isTeamLead = false;
-
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;

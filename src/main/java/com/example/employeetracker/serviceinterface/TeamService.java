@@ -16,4 +16,8 @@ public interface TeamService {
     void deleteTeam(Long teamId);
 
     TeamResponse addEmployeesToTeam(Long teamId, AddEmployeesRequest request);
+
+    TeamResponse assignTeamLead(Long teamId, Long employeeId);
+
+    TeamResponse removeEmployeeFromTeam(Long teamId, Long employeeId);
 }

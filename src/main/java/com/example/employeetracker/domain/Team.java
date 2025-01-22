@@ -25,7 +25,7 @@ public class Team {
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Employee> employees;
 
-    @ManyToOne
-    @JoinColumn(name = "team_lead_name")
+    @OneToOne
+    @JoinColumn(name = "team_lead_id")
     private Employee teamLead;
 }

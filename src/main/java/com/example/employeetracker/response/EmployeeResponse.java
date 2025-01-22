@@ -6,6 +6,5 @@ import lombok.Builder;
 public record EmployeeResponse(Long id,
                                String personalId,
                                String name,
-                               boolean isTeamLead,
-                               String teamName) {
+                               Long teamId) {
 }

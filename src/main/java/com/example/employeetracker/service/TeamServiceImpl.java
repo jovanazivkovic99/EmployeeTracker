@@ -25,40 +25,41 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional
     public TeamResponse createTeam(TeamRequest request) {
-        Employee teamLead = null;
+
+        Team team = new Team();
+        team.setName(request.teamName());
+
+        // if we have employeeIds
+        if (request.employeeIds() != null && !request.employeeIds().isEmpty()) {
+            List<Employee> employees = employeeRepository.findAllById(request.employeeIds());
+            team.getEmployees().addAll(employees);
+        }
+
+        // if we have teamLeadId
         if (request.teamLeadId() != null) {
-            teamLead = employeeRepository.findById(request.teamLeadId())
+
+            Employee teamLead = employeeRepository.findById(request.teamLeadId())
                     .orElseThrow(() -> new ResourceNotFoundException("Employee", request.teamLeadId()));
-
-            // todo napraviti custom exception
-            boolean isAlreadyTeamLead = teamRepository.existsByTeamLead(teamLead);
-            if (isAlreadyTeamLead) {
-                throw new IllegalStateException("The specified team lead is already assigned to another team.");
-            }
+            team.setTeamLead(teamLead);
         }
 
-        Team savedTeam = teamRepository.save(TeamMapper.mapRequestToTeam(request, teamLead));
-        if (teamLead != null) {
-            teamLead.setTeam(savedTeam);
-            teamLead.setTeamLead(true);
-            employeeRepository.save(teamLead);
-        }
+        Team savedTeam = teamRepository.save(team);
 
-        return TeamMapper.mapToTeamResponse(savedTeam);
+        return TeamMapper.toResponse(savedTeam);
     }
 
     @Override
     public TeamResponse getTeamById(Long teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new ResourceNotFoundException("Team", teamId));
-        return TeamMapper.mapToTeamResponse(team);
+        return TeamMapper.toResponse(team);
     }
 
     @Override
     public List<TeamResponse> getAllTeams() {
         List<Team> teams = teamRepository.findAll();
         return teams.stream()
-                .map(TeamMapper::mapToTeamResponse)
+                .map(TeamMapper::toResponse)
                 .toList();
     }
 
@@ -70,7 +71,7 @@ public class TeamServiceImpl implements TeamService {
         team.setName(updatedTeam.teamName());
 
         Team savedTeam = teamRepository.save(team);
-        return TeamMapper.mapToTeamResponse(savedTeam);
+        return TeamMapper.toResponse(savedTeam);
     }
 
     @Override
@@ -88,31 +89,59 @@ public class TeamServiceImpl implements TeamService {
                 .orElseThrow(() -> new ResourceNotFoundException("Team", teamId));
 
         List<Employee> employees = employeeRepository.findAllById(request.employeeIds());
-        if (employees.size() != request.employeeIds().size()) {
-            throw new ResourceNotFoundException("Some employees were not found.", teamId);
-        }
 
-        employees.forEach(employee -> employee.setTeam(team));
-        employeeRepository.saveAll(employees);
+        team.getEmployees().addAll(employees);
 
+        // if we have team lead to assign
         if (request.teamLeadId() != null) {
-            Employee teamLead = employees.stream()
-                    .filter(employee -> employee.getId().equals(request.teamLeadId()))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("The teamLeadId must be one of the provided employee IDs."));
 
             // Check if the team already has a team lead
             if (team.getTeamLead() != null) {
                 throw new IllegalStateException("This team already has a team lead.");
             }
 
-            teamLead.setTeamLead(true);
-            team.setTeamLead(teamLead);
-            employeeRepository.save(teamLead);
+            Employee newTeamLead = employeeRepository.findById(request.teamLeadId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Employee", request.teamLeadId()));
+
+
+            team.setTeamLead(newTeamLead);
         }
 
-        teamRepository.save(team);
+        return TeamMapper.toResponse(teamRepository.save(team));
+    }
 
-        return TeamMapper.mapToTeamResponse(team);
+    @Override
+    public TeamResponse assignTeamLead(Long teamId, Long employeeId) {
+        Team team = findTeamById(teamId);
+        Employee teamLead = findEmployeeById(employeeId);
+
+        if(teamLead.getTeam() == null || !teamLead.getId().equals(teamId)){
+            throw new IllegalStateException("Lead must be a member of the team.");
+        }
+        team.setTeamLead(teamLead);
+        return TeamMapper.toResponse(teamRepository.save(team));
+    }
+
+    @Override
+    public TeamResponse removeEmployeeFromTeam(Long teamId, Long employeeId) {
+        Team team = findTeamById(teamId);
+        Employee employee = findEmployeeById(employeeId);
+
+        if(employee.getTeam() != null && employee.getTeam().getId().equals(teamId)){
+            team.getEmployees().remove(employee);
+            employee.setTeam(null);
+            employeeRepository.save(employee);
+        }
+        return TeamMapper.toResponse(teamRepository.save(team));
+    }
+
+    private Team findTeamById(Long id) {
+        return teamRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Team", id));
+    }
+
+    private Employee findEmployeeById(Long id) {
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
     }
 }
