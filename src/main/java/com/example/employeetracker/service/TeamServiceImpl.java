@@ -32,7 +32,23 @@ public class TeamServiceImpl implements TeamService {
         // if we have employeeIds
         if (request.employeeIds() != null && !request.employeeIds().isEmpty()) {
             List<Employee> employees = employeeRepository.findAllById(request.employeeIds());
-            team.getEmployees().addAll(employees);
+
+
+            for (Employee e : employees) {
+                Team oldTeam = e.getTeam();
+                if (oldTeam != null) {
+
+                    // if employee was the lead of that oldTeam, remove them as lead
+                    if (oldTeam.getTeamLead() != null && oldTeam.getTeamLead().getId().equals(e.getId())) {
+                        oldTeam.setTeamLead(null);
+                    }
+
+                    // remove from old team's employees list
+                    oldTeam.getEmployees().remove(e);
+                }
+                e.setTeam(team);
+                team.getEmployees().add(e);
+            }
         }
 
         // if we have teamLeadId
@@ -41,6 +57,16 @@ public class TeamServiceImpl implements TeamService {
             Employee teamLead = employeeRepository.findById(request.teamLeadId())
                     .orElseThrow(() -> new ResourceNotFoundException("Employee", request.teamLeadId()));
             team.setTeamLead(teamLead);
+
+            // ensure the lead is in the new team as well
+            if (!team.getEmployees().contains(teamLead)) {
+                // remove from old team if needed
+                if (teamLead.getTeam() != null) {
+                    teamLead.getTeam().getEmployees().remove(teamLead);
+                }
+                teamLead.setTeam(team);
+                team.getEmployees().add(teamLead);
+            }
         }
 
         Team savedTeam = teamRepository.save(team);
@@ -90,7 +116,15 @@ public class TeamServiceImpl implements TeamService {
 
         List<Employee> employees = employeeRepository.findAllById(request.employeeIds());
 
-        team.getEmployees().addAll(employees);
+        // remove from old team (if any) and set them to the new team
+        for (Employee e : employees) {
+            Team oldTeam = e.getTeam();
+            if (oldTeam != null) {
+                oldTeam.getEmployees().remove(e);
+            }
+            e.setTeam(team);
+            team.getEmployees().add(e);
+        }
 
         // if we have team lead to assign
         if (request.teamLeadId() != null) {

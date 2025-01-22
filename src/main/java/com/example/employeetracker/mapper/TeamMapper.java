@@ -25,14 +25,15 @@ public class TeamMapper {
                 teamLead.getId(),
                 teamLead.getPersonalId(),
                 teamLead.getName(),
-                teamLead.getTeam().getId()
+                teamLead.getTeam() != null ? teamLead.getTeam().getId() : null
         );
     }
 
     private static List<EmployeeResponse> mapToEmployeesList(List<Employee> employees) {
         if (employees == null) return List.of();
         return employees.stream()
-                .map(emp -> new EmployeeResponse(emp.getId(), emp.getPersonalId(), emp.getName(), emp.getTeam().getId()))
+                .map(emp -> new EmployeeResponse(emp.getId(), emp.getPersonalId(), emp.getName(),
+                        emp.getTeam() != null? emp.getTeam().getId() : null))
                 .toList();
     }
 
