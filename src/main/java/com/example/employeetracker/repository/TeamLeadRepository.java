@@ -1,7 +1,8 @@
 package com.example.employeetracker.repository;
 
 import com.example.employeetracker.domain.Employee;
+import com.example.employeetracker.domain.TeamLead;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+public interface TeamLeadRepository extends JpaRepository<TeamLead, Long> {
 }
