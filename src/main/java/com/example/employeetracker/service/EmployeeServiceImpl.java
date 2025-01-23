@@ -82,15 +82,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         if (request.teamId() != null) {
             Team newTeam = findTeamById(request.teamId());
-
-            Team oldTeam = employee.getTeam();
-            if (oldTeam != null) {
-                oldTeam.getEmployees().remove(employee);
-            }
-
             employee.setTeam(newTeam);
-            newTeam.getEmployees().add(employee);
         }
+
         return EmployeeMapper.toResponse(employeeRepository.save(employee));
     }
 

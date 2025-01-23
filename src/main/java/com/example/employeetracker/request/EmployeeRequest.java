@@ -8,6 +8,7 @@ import lombok.Builder;
 public record EmployeeRequest(@NotBlank
                               @Pattern(regexp = "\\d{6}", message = "Personal id must be exactly 6 digits")
                               String personalId,
-                              @NotBlank String name,
+                              @NotBlank
+                              String name,
                               Long teamId) {
 }

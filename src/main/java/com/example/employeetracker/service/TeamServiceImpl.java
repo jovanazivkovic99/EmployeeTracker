@@ -50,6 +50,7 @@ public class TeamServiceImpl implements TeamService {
         team.setName(request.teamName());
 
         // add employees
+
         if (request.employeeIds() != null && !request.employeeIds().isEmpty()) {
             addEmployeesToTeam(request.employeeIds(), team);
         }
@@ -139,36 +140,13 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     @Override
     public TeamResponse addEmployeesToTeam(Long teamId, AddEmployeesRequest request) {
-        // Fetch the team
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new ResourceNotFoundException("Team", teamId));
 
-        List<Employee> employees = employeeRepository.findAllById(request.employeeIds());
+        Team team = findTeamById(teamId);
 
-        // remove from old team (if any) and set them to the new team
-        for (Employee e : employees) {
-            Team oldTeam = e.getTeam();
-            if (oldTeam != null) {
-                oldTeam.getEmployees().remove(e);
-            }
-            e.setTeam(team);
-            team.getEmployees().add(e);
-        }
+        //List<Employee> employees = employeeRepository.findAllById(request.employeeIds());
 
-        // if we have team lead to assign
-        if (request.teamLeadId() != null) {
+        addEmployeesToTeam(request.employeeIds(), team);
 
-            // Check if the team already has a team lead
-            if (team.getTeamLead() != null) {
-                throw new IllegalStateException("This team already has a team lead.");
-            }
-
-            Employee newTeamLead = employeeRepository.findById(request.teamLeadId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Employee", request.teamLeadId()));
-
-
-            team.setTeamLead(newTeamLead);
-        }
 
         return TeamMapper.toResponse(teamRepository.save(team));
     }
@@ -265,23 +243,10 @@ public class TeamServiceImpl implements TeamService {
      *
      */
     private void internalAssignLead(Long teamLeadId, Team team) {
-        Employee newTeamLead = employeeRepository.findById(teamLeadId)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", teamLeadId));
+        Employee newTeamLead = findEmployeeById(teamLeadId);
 
-        // replace lead
-        Employee oldTeamLead = team.getTeamLead();
-        if (oldTeamLead != null) {
-            oldTeamLead.setTeam(null);
-            team.getEmployees().remove(oldTeamLead); // remove the old lead from the employee list
-        }
-
-        newTeamLead.setTeam(team);
         team.setTeamLead(newTeamLead);
-
-        // add the new lead to the employee list if not already present
-        if (!team.getEmployees().contains(newTeamLead)) {
-            team.getEmployees().add(newTeamLead);
-        }
+        newTeamLead.setTeam(team);
     }
 
     /**
@@ -290,17 +255,14 @@ public class TeamServiceImpl implements TeamService {
      * and clearing the old team's lead reference if they were it.
      */
     private void addEmployeesToTeam(List<Long> employeeIds, Team team) {
+
         List<Employee> employees = employeeRepository.findAllById(employeeIds);
 
         for (Employee employee : employees) {
-            // remove employee from their current team if they have one
-            if (employee.getTeam() != null) {
-                Team oldTeam = employee.getTeam();
-                oldTeam.getEmployees().remove(employee);
-            }
-
             employee.setTeam(team);
-            team.getEmployees().add(employee);
+            if (!team.getEmployees().contains(employee)) {
+                team.getEmployees().add(employee);
+            }
         }
     }
 
