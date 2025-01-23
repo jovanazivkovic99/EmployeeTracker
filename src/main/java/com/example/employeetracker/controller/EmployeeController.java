@@ -1,10 +1,13 @@
 package com.example.employeetracker.controller;
 
+import com.example.employeetracker.domain.Employee;
 import com.example.employeetracker.request.EmployeeRequest;
 import com.example.employeetracker.response.EmployeeResponse;
 import com.example.employeetracker.serviceinterface.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,5 +41,22 @@ public class EmployeeController {
     @DeleteMapping("/{id}")
     public void deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);
+    }
+
+    @GetMapping("/search")
+    public List<EmployeeResponse> findAllEmployees(
+            @RequestParam(required = false) String personalId,
+            @RequestParam(required = false) String name
+
+            ) {
+        List<Employee> employees = employeeService.findAllEmployees(personalId, name);
+        return employees.stream()
+                .map(e -> new EmployeeResponse(
+                        e.getId(),
+                        e.getPersonalId(),
+                        e.getName(),
+                        (e.getTeam() != null) ? e.getTeam().getId() : null
+                ))
+                .toList();
     }
 }
