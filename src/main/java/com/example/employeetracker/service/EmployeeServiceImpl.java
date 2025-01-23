@@ -24,6 +24,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final TeamRepository teamRepository;
 
+    /**
+     * Adds a new employee.
+     * If a teamId is provided, we assign them to that team right away
+     *
+     * @param request The new employee's details
+     * @return A response with the employee data
+     */
     @Override
     public EmployeeResponse addEmployee(EmployeeRequest request) {
         Employee employee = new Employee();
@@ -65,6 +72,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         return EmployeeMapper.toResponse(employeeRepository.save(employee));
     }
 
+    /**
+     * Gets a list of all employees
+     *
+     * @return A list of EmployeeResponse
+     */
     @Override
     public List<EmployeeResponse> getAllEmployees() {
         List<Employee> employees = employeeRepository.findAll();
