@@ -46,20 +46,6 @@ public class TeamController {
         teamService.deleteTeam(teamId);
     }
 
-    @PostMapping("/{teamId}/add-employees")
-    public TeamResponse addEmployeesToTeam(
-            @PathVariable Long teamId,
-            @RequestBody AddEmployeesRequest request) {
-        return teamService.addEmployeesToTeam(teamId, request);
-    }
-
-    @PutMapping("/{teamId}/employee/{employeeId}/assign")
-    public TeamResponse assignTeamLead(
-            @PathVariable Long teamId,
-            @PathVariable Long employeeId) {
-        return teamService.assignTeamLead(teamId, employeeId);
-    }
-
     @PutMapping("/{teamId}/employee/{employeeId}/remove")
     public TeamResponse removeEmployeeFromTeam(
             @PathVariable Long teamId,

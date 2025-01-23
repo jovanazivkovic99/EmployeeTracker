@@ -16,10 +16,6 @@ public interface TeamService {
     TeamResponse updateTeam(Long teamId, TeamRequest updatedTeam);
     void deleteTeam(Long teamId);
 
-    TeamResponse addEmployeesToTeam(Long teamId, AddEmployeesRequest request);
-
-    TeamResponse assignTeamLead(Long teamId, Long employeeId);
-
     TeamResponse removeEmployeeFromTeam(Long teamId, Long employeeId);
 
     List<Team> searchTeams(String teamName, Long teamLeadId);

@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -104,7 +105,22 @@ public class TeamServiceImpl implements TeamService {
     public TeamResponse updateTeam(Long teamId, TeamRequest updatedTeam) {
         Team team = findTeamById(teamId);
 
-        team.setName(updatedTeam.teamName());
+        if (updatedTeam.teamName() != null && !updatedTeam.teamName().isBlank()) {
+            team.setName(updatedTeam.teamName());
+        }
+
+        if (updatedTeam.employeeIds() != null && !updatedTeam.employeeIds().isEmpty()) {
+            // add employees who are not already part of the team
+            updatedTeam.employeeIds().forEach(employeeId -> {
+                if (team.getEmployees().stream().noneMatch(employee -> employee.getId().equals(employeeId))) {
+                    addEmployeesToTeam(Collections.singletonList(employeeId), team);
+                }
+            });
+        }
+
+        if (updatedTeam.teamLeadId() != null) {
+            internalAssignLead(updatedTeam.teamLeadId(), team);
+        }
 
         Team savedTeam = teamRepository.save(team);
         return TeamMapper.toResponse(savedTeam);
@@ -127,57 +143,6 @@ public class TeamServiceImpl implements TeamService {
         employees.forEach(employee -> employee.setTeam(null));
         employeeRepository.saveAll(employees);
         teamRepository.delete(team);
-    }
-
-    /**
-     * Adds employees to a team in bulk, removing them from any old team if necessary,
-     * and sets a team lead if requested
-     *
-     * @param teamId  Which team to modify
-     * @param request A list of employee IDs, plus an optional lead ID
-     * @return Updated team
-     */
-    @Transactional
-    @Override
-    public TeamResponse addEmployeesToTeam(Long teamId, AddEmployeesRequest request) {
-
-        Team team = findTeamById(teamId);
-
-        //List<Employee> employees = employeeRepository.findAllById(request.employeeIds());
-
-        addEmployeesToTeam(request.employeeIds(), team);
-
-
-        return TeamMapper.toResponse(teamRepository.save(team));
-    }
-
-    /**
-     * Sets a specific employee as the lead for a given team,
-     * as long as that team doesn't already have one
-     * <p>
-     * If the team already has a lead, we throw an IllegalStateException
-     * asking to remove the old lead first. Otherwise, we
-     * attach the new lead to the team, save, and return the updated info
-     *
-     * @param teamId     ID of the team
-     * @param employeeId ID of the employee who'll become lead
-     * @return The updated {@link TeamResponse} with the new lead in place.
-     * @throws IllegalStateException if the team already has a lead.
-     */
-    @Override
-    public TeamResponse assignTeamLead(Long teamId, Long employeeId) {
-        Team team = findTeamById(teamId);
-        Employee teamLead = findEmployeeById(employeeId);
-
-        if (team.getTeamLead() != null) {
-            throw new IllegalStateException("Team already has a lead. Remove the old lead first.");
-        } else {
-            teamLead.setTeam(team);
-            team.getEmployees().add(teamLead);
-        }
-
-        team.setTeamLead(teamLead);
-        return TeamMapper.toResponse(teamRepository.save(team));
     }
 
     /**
