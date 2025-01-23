@@ -7,8 +7,6 @@ import com.example.employeetracker.response.EmployeeResponse;
 import com.example.employeetracker.serviceinterface.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,12 +43,12 @@ public class EmployeeController {
     }
 
     @GetMapping("/search")
-    public List<EmployeeResponse> findAllEmployees(
+    public List<EmployeeResponse> searchEmployees(
             @RequestParam(required = false) String personalId,
             @RequestParam(required = false) String name
 
             ) {
-        List<Employee> employees = employeeService.findAllEmployees(personalId, name);
+        List<Employee> employees = employeeService.searchEmployees(personalId, name);
         return employees.stream()
                 .map(e -> new EmployeeResponse(
                         e.getId(),

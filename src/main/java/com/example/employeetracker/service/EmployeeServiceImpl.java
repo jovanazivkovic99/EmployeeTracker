@@ -114,13 +114,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = findEmployeeById(id);
         if (employee.getTeam() != null) {
             Team team = employee.getTeam();
-            team.getEmployees().remove(employee);
+            if (team.getTeamLead() != null && team.getTeamLead().getId().equals(employee.getId())) {
+                // remove the employee as the team lead
+                team.setTeamLead(null);
+            }
         }
         employeeRepository.delete(employee);
     }
 
     @Override
-    public List<Employee> findAllEmployees(String personalId, String name) {
+    public List<Employee> searchEmployees(String personalId, String name) {
         final Specification<Employee> specification =
                 EmployeeSpecification.filterEmployee(
                         personalId, name);
