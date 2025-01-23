@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,6 +46,29 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         return EmployeeMapper.toResponse(employeeRepository.save(employee));
+    }
+
+    @Override
+    public List<EmployeeResponse> addEmployees(List<EmployeeRequest> requests) {
+        List<Employee> employees = new ArrayList<>();
+        for (EmployeeRequest e :  requests){
+            Employee employee = new Employee();
+            employee.setPersonalId(e.personalId());
+            employee.setName(e.name());
+
+            if (e.teamId() != null) {
+                Team team = findTeamById(e.teamId());
+                employee.setTeam(team);
+                team.getEmployees().add(employee);
+            }
+
+            employees.add(employee);
+
+        }
+
+        List<Employee> savedEmployees = employeeRepository.saveAll(employees);
+
+        return EmployeeMapper.toResponses(savedEmployees);
     }
 
     /**

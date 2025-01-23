@@ -14,4 +14,6 @@ public interface EmployeeService {
     EmployeeResponse updateEmployee(Long id, EmployeeUpdateRequest request);
     void deleteEmployee(Long id);
     List<Employee> searchEmployees(String personalId, String name);
+
+    List<EmployeeResponse> addEmployees(List<EmployeeRequest> employeeRequest);
 }

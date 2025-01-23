@@ -22,6 +22,11 @@ public class EmployeeController {
         return employeeService.addEmployee(employeeRequest);
     }
 
+    @PostMapping("/batch")
+    public List<EmployeeResponse> addEmployees(@Valid @RequestBody List<EmployeeRequest> employeeRequest) {
+        return employeeService.addEmployees(employeeRequest);
+    }
+
     @GetMapping
     public List<EmployeeResponse> getAllEmployees() {
         return employeeService.getAllEmployees();

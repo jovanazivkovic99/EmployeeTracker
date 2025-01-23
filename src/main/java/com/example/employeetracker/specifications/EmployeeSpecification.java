@@ -36,4 +36,8 @@ public class EmployeeSpecification {
     private static String likePattern(String value) {
         return "%" + value + "%";
     }
+    //    SELECT *
+//FROM employees
+//WHERE personal_id LIKE '%123%'
+//  AND name LIKE '%John%';
 }
