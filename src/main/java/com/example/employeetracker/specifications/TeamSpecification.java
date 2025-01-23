@@ -1,9 +1,6 @@
 package com.example.employeetracker.specifications;
 
-import com.example.employeetracker.domain.Employee;
 import com.example.employeetracker.domain.Team;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +14,15 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class TeamSpecification {
+
+    /**
+     * Creates a dynamic query for {@link Team}. Pass in a partial team name
+     * or a team lead's ID to filter down the results.
+     *
+     * @param teamName   Optional piece of text we match against the team's name (case-insensitive).
+     * @param teamLeadId Optional ID of the team's lead.
+     * @return {@link Specification} of a Team
+     */
     public static Specification<Team> filterTeams(
             String teamName,
             Long teamLeadId

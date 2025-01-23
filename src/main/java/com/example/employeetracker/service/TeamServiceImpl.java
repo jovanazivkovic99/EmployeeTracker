@@ -24,6 +24,12 @@ public class TeamServiceImpl implements TeamService {
     private final TeamRepository teamRepository;
     private final EmployeeRepository employeeRepository;
 
+    /**
+     * Creates a new team with optional employees and a team lead
+     *
+     * @param request A request body that includes team name, optional employee IDs, and optional team lead ID
+     * @return The newly created team in a response object
+     */
     @Override
     @Transactional
     public TeamResponse createTeam(TeamRequest request) {
@@ -78,8 +84,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public TeamResponse getTeamById(Long teamId) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new ResourceNotFoundException("Team", teamId));
+        Team team = findTeamById(teamId);
         return TeamMapper.toResponse(team);
     }
 
@@ -91,6 +96,13 @@ public class TeamServiceImpl implements TeamService {
                 .toList();
     }
 
+    /**
+     * Updates a team's info (like name, employees, or team lead)
+     *
+     * @param teamId   The team to update
+     * @param updatedTeam  The new data for the team
+     * @return The updated team in a response object
+     */
     @Override
     public TeamResponse updateTeam(Long teamId, TeamRequest updatedTeam) {
         Team team = findTeamById(teamId);
@@ -101,6 +113,15 @@ public class TeamServiceImpl implements TeamService {
         return TeamMapper.toResponse(savedTeam);
     }
 
+    /**
+     * Completely removes the specified team from the database,
+     * and any employees tied to that team get "unassigned" first
+     * <p>
+     * We set each employee's 'team' field to null,
+     * then save those employees, and finally delete the team itself
+     *
+     * @param teamId the numeric ID of the team to remove
+     */
     @Override
     @Transactional
     public void deleteTeam(Long teamId) {
@@ -177,6 +198,13 @@ public class TeamServiceImpl implements TeamService {
         return TeamMapper.toResponse(teamRepository.save(team));
     }
 
+    /**
+     * Lets you search for teams by name or team lead ID
+     *
+     * @param teamName   Text to look for in the team's name (case-insensitive)
+     * @param teamLeadId If not null, we look for teams led by this ID
+     * @return A list of simple DTOs with team info
+     */
     @Override
     public List<Team> searchTeams(String teamName, Long teamLeadId){
         Specification<Team> spec = TeamSpecification.filterTeams(
