@@ -38,9 +38,9 @@ public class TeamSpecification {
             }
 
             if (teamLeadId != null) {
-                predicates.add(cb.like(
-                        cb.lower(root.get("teamLeadId")),
-                        "%" + teamLeadId + "%"
+                predicates.add(cb.equal(
+                        root.get("teamLead").get("id"),
+                        teamLeadId
                 ));
             }
 
