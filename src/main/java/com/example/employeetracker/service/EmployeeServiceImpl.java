@@ -46,6 +46,28 @@ public class EmployeeServiceImpl implements EmployeeService {
         return EmployeeMapper.toResponse(employeeRepository.save(employee));
     }
 
+    /**
+     * Updates the details of an existing employee.
+     * <p>
+     * The method does:
+     * <ul>
+     *   <li>1) Updates the employee's personal ID, if provided</li>
+     *   <li>2) Updates the employee's name, if provided</li>
+     *   <li>3) Updates the employee's team assignment, if a valid {@code teamId} is provided
+     *       <ul>
+     *           <li>If the employee is already assigned to a different team, they are removed from the old team.</li>
+     *           <li>The employee is then added to the new team</li>
+     *       </ul>
+     *   </li>
+     * </ul>
+     * Finally, the updated employee is saved, and a response object is returned.
+     * </p>
+     *
+     * @param id      The ID of the employee to update.
+     * @param request {@link EmployeeRequest}
+     * @return {@link EmployeeResponse} representing the updated employee
+     * @throws ResourceNotFoundException If the employee or the new team (if specified) does not exist
+     */
     @Override
     public EmployeeResponse updateEmployee(Long id, EmployeeRequest request) {
         Employee employee = findEmployeeById(id);
