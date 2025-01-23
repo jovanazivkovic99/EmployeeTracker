@@ -23,7 +23,7 @@ public class Team {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "team")
     private List<Employee> employees = new ArrayList<>();
 
     @OneToOne

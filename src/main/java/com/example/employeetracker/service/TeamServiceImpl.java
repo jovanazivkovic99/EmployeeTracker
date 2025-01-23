@@ -91,8 +91,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public TeamResponse updateTeam(Long teamId, TeamRequest updatedTeam) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new ResourceNotFoundException("Team", teamId));
+        Team team = findTeamById(teamId);
 
         team.setName(updatedTeam.teamName());
 
@@ -102,8 +101,10 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public void deleteTeam(Long teamId) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new ResourceNotFoundException("Team", teamId));
+        Team team = findTeamById(teamId);
+        List<Employee> employees = team.getEmployees();
+        employees.forEach(employee -> employee.setTeam(null));
+        employeeRepository.saveAll(employees);
         teamRepository.delete(team);
     }
 

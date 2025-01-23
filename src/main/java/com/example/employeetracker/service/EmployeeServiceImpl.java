@@ -1,7 +1,7 @@
 package com.example.employeetracker.service;
 
 import com.example.employeetracker.domain.Employee;
-import com.example.employeetracker.domain.EmployeeSpecification;
+import com.example.employeetracker.specifications.EmployeeSpecification;
 import com.example.employeetracker.domain.Team;
 import com.example.employeetracker.exception.ResourceNotFoundException;
 import com.example.employeetracker.mapper.EmployeeMapper;
@@ -11,13 +11,10 @@ import com.example.employeetracker.request.EmployeeRequest;
 import com.example.employeetracker.response.EmployeeResponse;
 import com.example.employeetracker.serviceinterface.EmployeeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -87,25 +84,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void deleteEmployee(Long id) {
         Employee employee = findEmployeeById(id);
         if (employee.getTeam() != null) {
-            employee.getTeam().getEmployees().remove(employee);
+            Team team = employee.getTeam();
+            team.getEmployees().remove(employee);
+            teamRepository.save(team);
         }
         employeeRepository.delete(employee);
     }
 
-    /*@Override
-    public Page<EmployeeResponse> searchEmployees(Map<String, String> params) {
-        int offset = Integer.parseInt(params.get("offset"));
-        int pageSize = Integer.parseInt(params.get("pageSize"));
-        PageRequest pageable = PageRequest.of(offset,pageSize);
-
-        params.remove("offset");
-        params.remove("pageSize");
-
-        Specification<Employee> specification = EmployeeSpecification.filterEmployee(params);
-
-        final Page<Employee> employees = this.employeeRepository.findAll(specification,pageable);
-        return employees.map(EmployeeMapper::employeeToEmployeeDto);
-    }*/
     @Override
     public List<Employee> findAllEmployees(String personalId, String name) {
         final Specification<Employee> specification =

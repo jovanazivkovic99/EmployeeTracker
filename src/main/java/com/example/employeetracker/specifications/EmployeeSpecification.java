@@ -1,8 +1,8 @@
-package com.example.employeetracker.domain;
+package com.example.employeetracker.specifications;
 
+import com.example.employeetracker.domain.Employee;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.criteria.Predicate;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
