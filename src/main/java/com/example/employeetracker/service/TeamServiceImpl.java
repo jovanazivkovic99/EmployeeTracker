@@ -100,6 +100,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
+    @Transactional
     public void deleteTeam(Long teamId) {
         Team team = findTeamById(teamId);
         List<Employee> employees = team.getEmployees();

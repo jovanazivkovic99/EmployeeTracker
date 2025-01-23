@@ -13,6 +13,7 @@ import com.example.employeetracker.serviceinterface.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -61,8 +62,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee.setTeam(newTeam);
             newTeam.getEmployees().add(employee);
         }
-        //Employee updatedEmployee = employeeRepository.save(employee);
-        //teamRepository.save(updatedEmployee.getTeam());
         return EmployeeMapper.toResponse(employeeRepository.save(employee));
     }
 
@@ -81,12 +80,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional
     public void deleteEmployee(Long id) {
         Employee employee = findEmployeeById(id);
         if (employee.getTeam() != null) {
             Team team = employee.getTeam();
             team.getEmployees().remove(employee);
-            teamRepository.save(team);
         }
         employeeRepository.delete(employee);
     }
