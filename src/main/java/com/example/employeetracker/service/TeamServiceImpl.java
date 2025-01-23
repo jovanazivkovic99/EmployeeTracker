@@ -10,7 +10,9 @@ import com.example.employeetracker.request.AddEmployeesRequest;
 import com.example.employeetracker.request.TeamRequest;
 import com.example.employeetracker.response.TeamResponse;
 import com.example.employeetracker.serviceinterface.TeamService;
+import com.example.employeetracker.specifications.TeamSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -173,6 +175,15 @@ public class TeamServiceImpl implements TeamService {
             employeeRepository.save(employee);
         }
         return TeamMapper.toResponse(teamRepository.save(team));
+    }
+
+    @Override
+    public List<Team> searchTeams(String teamName, Long teamLeadId){
+        Specification<Team> spec = TeamSpecification.filterTeams(
+                teamName,
+                teamLeadId
+        );
+        return teamRepository.findAll(spec);
     }
 
     private Team findTeamById(Long id) {

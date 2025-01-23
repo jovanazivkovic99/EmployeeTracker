@@ -6,7 +6,10 @@ import com.example.employeetracker.response.EmployeeResponse;
 public class EmployeeMapper {
 
     public static EmployeeResponse toResponse(Employee employee) {
-        return EmployeeResponse.builder()
+        if (employee == null) {
+            return null;
+        }
+            return EmployeeResponse.builder()
                 .id(employee.getId())
                 .personalId(employee.getPersonalId())
                 .name(employee.getName())

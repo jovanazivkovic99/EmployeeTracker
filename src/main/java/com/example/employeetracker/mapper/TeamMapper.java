@@ -29,7 +29,7 @@ public class TeamMapper {
         );
     }
 
-    private static List<EmployeeResponse> mapToEmployeesList(List<Employee> employees) {
+    public static List<EmployeeResponse> mapToEmployeesList(List<Employee> employees) {
         if (employees == null) return List.of();
         return employees.stream()
                 .map(emp -> new EmployeeResponse(emp.getId(), emp.getPersonalId(), emp.getName(),

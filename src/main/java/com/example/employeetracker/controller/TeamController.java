@@ -1,7 +1,12 @@
 package com.example.employeetracker.controller;
 
+import com.example.employeetracker.domain.Employee;
+import com.example.employeetracker.domain.Team;
+import com.example.employeetracker.mapper.EmployeeMapper;
+import com.example.employeetracker.mapper.TeamMapper;
 import com.example.employeetracker.request.AddEmployeesRequest;
 import com.example.employeetracker.request.TeamRequest;
+import com.example.employeetracker.response.EmployeeResponse;
 import com.example.employeetracker.response.TeamResponse;
 import com.example.employeetracker.serviceinterface.TeamService;
 import jakarta.validation.Valid;
@@ -60,6 +65,25 @@ public class TeamController {
             @PathVariable Long teamId,
             @PathVariable Long employeeId) {
         return teamService.removeEmployeeFromTeam(teamId, employeeId);
+    }
+
+    @GetMapping("/search")
+    public List<TeamResponse> searchTeams(
+            @RequestParam(required = false) String teamName,
+            @RequestParam(required = false) Long teamLeadId
+    ) {
+        List<Team> teams = teamService.searchTeams(teamName, teamLeadId);
+
+        return teams.stream()
+                .map(team -> TeamResponse.builder()
+                        .id(team.getId())
+                        .name(team.getName())
+                        .teamLead(EmployeeMapper.toResponse(team.getTeamLead()))
+                        .employees(TeamMapper.mapToEmployeesList(team.getEmployees()))
+                        .build()
+                )
+                .toList();
+
     }
 
 }
