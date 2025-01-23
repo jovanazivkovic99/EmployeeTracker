@@ -2,6 +2,7 @@ package com.example.employeetracker.controller;
 
 import com.example.employeetracker.domain.Employee;
 import com.example.employeetracker.request.EmployeeRequest;
+import com.example.employeetracker.request.EmployeeUpdateRequest;
 import com.example.employeetracker.response.EmployeeResponse;
 import com.example.employeetracker.serviceinterface.EmployeeService;
 import jakarta.validation.Valid;
@@ -34,7 +35,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
-    public EmployeeResponse updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeRequest request) {
+    public EmployeeResponse updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeUpdateRequest request) {
         return employeeService.updateEmployee(id, request);
     }
 

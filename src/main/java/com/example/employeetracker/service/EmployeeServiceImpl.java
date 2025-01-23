@@ -1,6 +1,7 @@
 package com.example.employeetracker.service;
 
 import com.example.employeetracker.domain.Employee;
+import com.example.employeetracker.request.EmployeeUpdateRequest;
 import com.example.employeetracker.specifications.EmployeeSpecification;
 import com.example.employeetracker.domain.Team;
 import com.example.employeetracker.exception.ResourceNotFoundException;
@@ -69,7 +70,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @throws ResourceNotFoundException If the employee or the new team (if specified) does not exist
      */
     @Override
-    public EmployeeResponse updateEmployee(Long id, EmployeeRequest request) {
+    public EmployeeResponse updateEmployee(Long id, EmployeeUpdateRequest request) {
         Employee employee = findEmployeeById(id);
 
         if (request.personalId() != null) {
